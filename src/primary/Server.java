@@ -50,24 +50,54 @@ class Server extends Thread{
 	}
 	
 	public void Lamports() throws Exception{
+        //On generating a critical section request:
+        // Insert the request into the priority queue
+        Q.put(new Requests(Program.myNode, getClock()));
+
+        // Broadcast the request to all processes
 		for(int i = 0; i < Program.numNodes-1; i++){
 			threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
 			updateReplied(i,false);
 		}
 		
+        // Enter critical section only when:
+        //  L1': Pi has received a REPLY message from all processes
+        //  (any request received by Pi in the future will have timestamp larger than that of Pi's own request.
+        //  L2:  Pi's own request is at the top of its queue
+        //  (Pi's request has the smallest timestamp among all requests received by Pi so far.
 		while(!RepliedAllTrue() && Q.peek().getNode() != Program.myNode)
 			this.wait();
-		
 		return;
 	}
 	
-	public void RicartAndAgrawala(){
-		
+	public void RicartAndAgrawala() throws Exception{
+        //steps:
+        //  On generating a critical section request:
+        //      broadcast the request to all processes
+        for(int i = 0; i < Program.numNodes-1; i++){
+            threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
+            updateReplied(i, false);
+        }
+
+        //  Enter critical section only once Pi has received a REPLY from all processes
+        while(!RepliedAllTrue()){
+            this.wait();
+        }
+        return;
 	}
 	
 	public void Release() throws Exception{
+        //Lamports:
+        //  on leaving the critical section:
+        //      remove the request from the queue
+        Q.take();
+        //      Broadcast a release message to all processes
 		for(int i = 0; i < Program.numNodes-1; i++)
 			threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
+
+        //RicartAgrawalas:
+        // send all deferred REPLY messages
+        //TODO
 	}
 	
 	static void updateReplied(int index, boolean value){

@@ -29,9 +29,27 @@ class ServerThread extends Thread{
 				do {
 					m = (Message)ois.readObject();
 					
+                    //Lamports:
+                    // on receiving a critical section request from another process:
+                    //  insert the request into the priority queue (done)
+                    //  send a REPLY message to the requesting process
+                    //
+                    // On receiving a release message from another process:
+                    //  remove the request of that process from the queue (done)
+
+
+                    //RicartAgrawalas:
+                    //TODO
+                    // On receiving a critical section request from another process:
+                    // if (Pi has no unfulfilled request of its own OR
+                    //     Pi's unfulfilled request has a larger timestamp than that of the received request):
+                    // then send a REPLY to requesting process
+                    // else: defer sending REPLY message
+
 					switch(m.GetType()){
 					case Request:
 						Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
+                        //need to add a reply to requesting process here for Lamports?
 						break;
 					case Reply:
 						Server.updateReplied(m.GetFrom(), true);

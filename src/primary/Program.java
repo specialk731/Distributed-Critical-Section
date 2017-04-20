@@ -16,9 +16,11 @@ public class Program {
 	static Map<Integer, ObjectOutputStream> oos = new HashMap<>();
 	static boolean Lamports = true;
 	static Server svr;
+    private static Random rand;
 	
 	public static void main(String[] args) {
 		
+        rand = new Random();
 		setup(args);
 		
 		showInfo();
@@ -145,16 +147,22 @@ public class Program {
 	
 	private static long generateInterRequestDelay(){
 		long tmp;
-		
-		tmp = interRequestDelay;
+        //mean value of an exponentially distributed random value is 1/lambda
+        // a random exponentially distributed value can be given by log(1-x)/lambda
+        // where 0<=x<=1. Thus "log(1-x)*mean" is a suitable function.
+		tmp = (long) Math.log(1-rand.nextLong())*interRequestDelay;
+        // (no Math.log function returns long type, so I'm casting it.)
 		
 		return tmp;
 	}
 	
 	private static long generateExectutionTime(){
 		long tmp;
-		
-		tmp = executionTime;
+        //mean value of an exponentially distributed random value is 1/lambda
+        // a random exponentially distributed value can be given by log(1-x)/lambda
+        // where 0<=x<=1. Thus "log(1-x)*mean" is a suitable function.
+		tmp = (long) Math.log(1-rand.nextLong())*executionTime;
+        // (no Math.log function returns long type, so I'm casting it.)
 		
 		return tmp;
 		

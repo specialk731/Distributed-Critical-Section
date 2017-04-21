@@ -1,6 +1,6 @@
 package primary;
 
-import java.io.*;
+//import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -10,18 +10,21 @@ class Server extends Thread{
 	String myAddress;
 	int myPort;
 	static private long myClock = 0;
-	static ReadWriteLock ClockLock = new ReentrantReadWriteLock(), RepliedLock = new ReentrantReadWriteLock();
+	static ReadWriteLock ClockLock = new ReentrantReadWriteLock(), RepliedLock = new ReentrantReadWriteLock(), terminateLock = new ReentrantReadWriteLock();
 	static boolean serverOn = true;
-	static boolean[] replied;
+	static boolean[] replied, terminate;
+	static int numNodes;
 	static ServerSocket serversocket;
 	List<ServerThread> threads = new ArrayList<>();
 
 	static BlockingQueue<Requests> Q = new PriorityBlockingQueue<>();
 	
-	Server(String s ,String s2, int numNodes){
+	Server(String s ,String s2, int numberNodes){
 		myAddress = s;
 		myPort = Integer.parseInt(s2);
+		numNodes = numberNodes;
 		replied = new boolean[numNodes-1];
+		terminate = new boolean[numNodes-1];
 	}
 	
 	public void run(){
@@ -29,13 +32,23 @@ class Server extends Thread{
 		try{
 			serversocket = new ServerSocket(myPort);		
 			
-			for(int i = 0; i < Program.addresses.size()-1; i++){
+			for(int i = 0; i < Program.addresses.size(); i++){
 				Socket s = serversocket.accept();
-				threads.add(new ServerThread(s, this));
+				threads.add(new ServerThread(s, this, numNodes, i));
 				threads.get(i).start();
+				updateTerminate(i,false);
 			}
+			/*
+			while(!TerminateAllTrue()){
+				this.wait();
+			}
+			
+			for(int i = 0; i < Program.addresses.size(); i++)
+				threads.get(i).terminate = true;
+			*/
 		} catch(Exception e){
-			System.out.println("Error in Server: " + e);
+			System.out.println("Error in Server: ");
+			e.printStackTrace();
 		}
 		
 		for(int i=0; i<threads.size(); i++) {
@@ -46,17 +59,19 @@ class Server extends Thread{
 			}
 		}
 		
+		
 		System.out.println("End of Server");
 	}
 	
-	public void Lamports() throws Exception{
+	public synchronized void Lamports() throws Exception{
         //On generating a critical section request:
         // Insert the request into the priority queue
         Q.put(new Requests(Program.myNode, getClock()));
 
         // Broadcast the request to all processes
 		for(int i = 0; i < Program.numNodes-1; i++){
-			threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
+			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
+			//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
 			updateReplied(i,false);
 		}
 		
@@ -65,17 +80,19 @@ class Server extends Thread{
         //  (any request received by Pi in the future will have timestamp larger than that of Pi's own request.
         //  L2:  Pi's own request is at the top of its queue
         //  (Pi's request has the smallest timestamp among all requests received by Pi so far.
-		while(!RepliedAllTrue() && Q.peek().getNode() != Program.myNode)
-			this.wait();
+		while(!RepliedAllTrue() || Q.peek().getNode() != Program.myNode){
+			//System.out.println("Waiting for CS... Peeked a " + Q.peek().getNode());
+			wait();
+		}
 		return;
 	}
 	
-	public void RicartAndAgrawala() throws Exception{
+	public synchronized void RicartAndAgrawala() throws Exception{
         //steps:
         //  On generating a critical section request:
         //      broadcast the request to all processes
         for(int i = 0; i < Program.numNodes-1; i++){
-            threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
+            //threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
             updateReplied(i, false);
         }
 
@@ -93,7 +110,8 @@ class Server extends Thread{
         Q.take();
         //      Broadcast a release message to all processes
 		for(int i = 0; i < Program.numNodes-1; i++)
-			threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
+			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
+			//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
 
         //RicartAgrawalas:
         // send all deferred REPLY messages
@@ -101,7 +119,9 @@ class Server extends Thread{
 	}
 	
 	static void updateReplied(int index, boolean value){
+		//System.out.println("Changing: " + index + " to: " + value);
 		RepliedLock.writeLock().lock();
+		//System.out.println("Index: " + index);
 		replied[index]=value;
 		RepliedLock.writeLock().unlock();
 	}
@@ -110,7 +130,7 @@ class Server extends Thread{
 		boolean tmp = true;
 		RepliedLock.readLock().lock();
 		for(int i = 0; i < replied.length; i++)
-			if(!replied[i])
+			if(replied[i] == false)
 				tmp = false;
 		RepliedLock.readLock().unlock();
 		return tmp;
@@ -132,8 +152,25 @@ class Server extends Thread{
 		ClockLock.readLock().unlock();
 		return tmp;
 	}
+	
+	static void updateTerminate(int index, boolean value){
+		terminateLock.writeLock().lock();
+		terminate[index] = value;
+		terminateLock.writeLock().unlock();
+	}
+	
+	static boolean TerminateAllTrue(){
+		boolean tmp = true;
+		terminateLock.readLock().lock();
+		for(int i = 0; i < terminate.length; i++)
+			if (terminate[i] == false)
+				tmp = false;
+		terminateLock.readLock().unlock();
+		return tmp;
+		
+	}
 
-	public void TurnOffServer() throws IOException {
+	public void TurnOffServer() throws Exception {
 		serversocket.close();
 	}
 }

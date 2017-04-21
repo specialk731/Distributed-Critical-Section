@@ -5,16 +5,19 @@ import java.net.*;
 
 class ServerThread extends Thread{
 	Socket socket = null;
-	int node = -1;
+	int node = -1, index;
 	Message m = new Message(Program.myNode, 0, Message.type.Request, -1);
 	ObjectOutputStream oos = null;
 	ObjectInputStream ois = null;
 	boolean terminate = false;
+	boolean terminateall[];
 	Server svr;
 	
-	public ServerThread(Socket s, Server SVR){
+	public ServerThread(Socket s, Server SVR, int numNodes, int ind){
 		socket = s;
 		svr = SVR;
+		terminateall = new boolean[numNodes-1];
+		index = ind;
 	}
 	
 	public void run(){
@@ -27,6 +30,7 @@ class ServerThread extends Thread{
 					
 			if(node >= 0) {
 				do {
+					//System.out.println("Thread: " + index + " Waiting for Message...");
 					m = (Message)ois.readObject();
 					
                     //Lamports:
@@ -45,27 +49,33 @@ class ServerThread extends Thread{
                     //     Pi's unfulfilled request has a larger timestamp than that of the received request):
                     // then send a REPLY to requesting process
                     // else: defer sending REPLY message
+					
+					//System.out.println("Thread " + index + " Got a message");
 
 					switch(m.GetType()){
 					case Request:
+						//System.out.println("Adding to Q: " + m.GetFrom() + ":" + m.GetClock());
 						Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
-                        //need to add a reply to requesting process here for Lamports?
+						Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, node, Message.type.Reply, Server.getClock())); //Plus 1???
 						break;
 					case Reply:
-						Server.updateReplied(m.GetFrom(), true);
+						Server.updateReplied(index, true);
 						break;
 					case Release:
 						Server.Q.take();
 						break;
 					case Termination:
-						terminate = true;
+						Server.updateTerminate(index, true);
+						//terminate = true;
 						break;
 					default:
 						System.out.println("Message Type ERROR...");
 					}
 					
 					Server.updateClock(m.GetClock());
-					notifyAll();
+					synchronized(svr){
+					svr.notify();
+					}
 
 					
 				}
@@ -74,6 +84,8 @@ class ServerThread extends Thread{
 				System.out.println("Got a bad Node");
 			}
 			
+			System.out.println("Thread " + index + " Terminating");
+			
 			ois.close();
 			oos.close();
 			socket.close();
@@ -81,13 +93,15 @@ class ServerThread extends Thread{
 		} catch (SocketException e) {
 			
 		} catch (Exception e) {
-			System.out.println("Error in ServerThread: " + e);
+			System.out.println("Error in ServerThread: ");
+			e.printStackTrace();
 		}
 	}	
 	
-	synchronized void write(Message m) throws Exception{
+	/*synchronized void write(Message m) throws Exception{
+		System.out.println("Thread " + index + " Writing message: " + m.GetClock());
 		oos.writeObject(m);
 		oos.flush();
-	}
+	}*/
 	
 }

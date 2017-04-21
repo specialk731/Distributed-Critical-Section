@@ -21,33 +21,45 @@ public class Program {
 	public static void main(String[] args) {
 		
         rand = new Random();
+        
+        //Uses config.txt to set up variables
 		setup(args);
 		
+		//Outputs to console variables from config.txt
 		showInfo();
 		
+		//Start the Server
 		svr = new Server(myAddress, myPort, numNodes);
 		svr.start();
-						
+		
 		try{
 			Thread.sleep(5000);
 			
 			clientSetup(addresses, ports);
-			
+						
 			System.out.println("Starting CS Requests");
 
+			//Start of Application and run for numRequests times
 			for(int i = 0; i < numRequests; i++){
+				System.out.println("Starting Request: " + i);
+				//Sleep before entering CS
 				Thread.sleep(generateInterRequestDelay());
+				//Attempt to enter CS
 				csEnter(Lamports);
+				System.out.println("Node: " + myNode + " is in the CS with clock value: " + Server.Q.peek().getClock());
+				//Sleep while in the CS
 				Thread.sleep(generateExectutionTime());
+				//Attempt to exit CS
 				csExit(Lamports);
+				System.out.println("Finished Request: " + i);
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
-		//showInfo();
-		
+						
 		System.out.println("Node " + myNode + " has finished");
+		
+		//svr.done();
 	}
 	
 	private static void showInfo(){
@@ -65,7 +77,7 @@ public class Program {
 		System.out.println("myPort: " + myPort);
 		
 		for(int i = 0; i < neighborsNode.length; i++)
-			System.out.println("Node " + neighborsNode[i] + ": " + addresses.get(neighborsNode[i]) + ":" + ports.get(neighborsNode[i]));
+			System.out.println("Node " + neighborsNode[i] + ": " + addresses.get(i) + ":" + ports.get(i));
 
 	}
 	
@@ -105,21 +117,21 @@ public class Program {
 				tmp2 = tmp.split("\\s+");
 				
 				if(Integer.parseInt(tmp2[0]) == myNode){
-					if(tmp2[1].contains(".utdallas.edu"))
+					if(tmp2[1].contains(".utdallas.edu") || tmp2[1].equals("127.0.0.1"))
 						myAddress = tmp2[1];
 					else
-						myAddress = tmp2[1]/* + ".utdallas.edu"*/;
+						myAddress = tmp2[1] + ".utdallas.edu";
 					
 					myPort = tmp2[2];
 				}else{
 					neighborsNode[j] = Integer.parseInt(tmp2[0]);
 					
-					if(tmp2[1].contains(".utdallas.edu"))
-						addresses.put(neighborsNode[j], tmp2[1]);
+					if(tmp2[1].contains(".utdallas.edu") || tmp2[1].equals("127.0.0.1"))
+						addresses.put(j, tmp2[1]);
 					else
-						addresses.put(neighborsNode[j], tmp2[1]/* + ".utdallas.edu"*/);
+						addresses.put(j, tmp2[1] + ".utdallas.edu");
 					
-					ports.put(neighborsNode[j], tmp2[2]);
+					ports.put(j, tmp2[2]);
 					j++;
 				}
 				
@@ -136,11 +148,11 @@ public class Program {
 	
 	private static void clientSetup(Map<Integer, String> a,Map<Integer, String> p) throws Exception{
 		for(int i = 0; i < numNodes-1; i++){
-			clients.put(neighborsNode[i], new Socket(addresses.get(neighborsNode[i]), Integer.parseInt(ports.get(neighborsNode[i]))));
-			oos.put(neighborsNode[i],  new ObjectOutputStream(clients.get(neighborsNode[i]).getOutputStream()));
+			clients.put(i, new Socket(addresses.get(i), Integer.parseInt(ports.get(i))));
+			oos.put(i,  new ObjectOutputStream(clients.get(i).getOutputStream()));
 			
-			oos.get(neighborsNode[i]).writeInt(myNode);
-			oos.get(neighborsNode[i]).flush();
+			oos.get(i).writeInt(myNode);
+			oos.get(i).flush();
 			Thread.sleep(5000);
 		}
 	}
@@ -181,6 +193,20 @@ public class Program {
 		if(Lamp)
 			svr.Release();
 		else;
+	}
+	
+	public static int Convert(int i){
+		for(int j = 0; j < neighborsNode.length; j++)
+			if(neighborsNode[j] == i)
+				return j;
+		
+		return -1;
+	}
+	
+	synchronized static void write(int node,Message m) throws Exception{
+		//System.out.println("Writing to node " + node/* + " at index " + Convert(node)*/);
+		oos.get(node).writeObject(m);
+		oos.get(node).flush();
 	}
 
 }

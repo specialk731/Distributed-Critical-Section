@@ -56,13 +56,23 @@ class ServerThread extends Thread{
 					case Request:
 						//System.out.println("Adding to Q: " + m.GetFrom() + ":" + m.GetClock());
 						Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
-						Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, node, Message.type.Reply, Server.getClock())); //Plus 1???
+						if(Program.Lamports)
+							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
+						else{
+							//HERE IS WHERE I STOPPED
+							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock())
+								//Send Reply
+								Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
+							else
+								//Otherwise Defer
+								Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
+						}
 						break;
 					case Reply:
 						Server.updateReplied(index, true);
 						break;
 					case Release:
-						Server.Q.take();
+						Server.Q.take();								
 						break;
 					case Termination:
 						Server.updateTerminate(index, true);

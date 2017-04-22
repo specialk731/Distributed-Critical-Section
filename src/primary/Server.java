@@ -16,7 +16,8 @@ class Server extends Thread{
 	static int numNodes;
 	static ServerSocket serversocket;
 	List<ServerThread> threads = new ArrayList<>();
-
+	
+	static Queue<Requests> Defered = new ConcurrentLinkedQueue<>();
 	static BlockingQueue<Requests> Q = new PriorityBlockingQueue<>();
 	
 	Server(String s ,String s2, int numberNodes){
@@ -63,7 +64,7 @@ class Server extends Thread{
 		System.out.println("End of Server");
 	}
 	
-	public synchronized void Lamports() throws Exception{
+	public void Lamports() throws Exception{
         //On generating a critical section request:
         // Insert the request into the priority queue
         Q.put(new Requests(Program.myNode, getClock()));
@@ -82,7 +83,9 @@ class Server extends Thread{
         //  (Pi's request has the smallest timestamp among all requests received by Pi so far.
 		while(!RepliedAllTrue() || Q.peek().getNode() != Program.myNode){
 			//System.out.println("Waiting for CS... Peeked a " + Q.peek().getNode());
-			wait();
+			synchronized(this){
+				wait();
+			}
 		}
 		return;
 	}
@@ -109,6 +112,7 @@ class Server extends Thread{
         //      remove the request from the queue
         Q.take();
         //      Broadcast a release message to all processes
+        if(Program.Lamports)
 		for(int i = 0; i < Program.numNodes-1; i++)
 			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
 			//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
@@ -116,6 +120,15 @@ class Server extends Thread{
         //RicartAgrawalas:
         // send all deferred REPLY messages
         //TODO
+		
+        else{
+			Requests R;
+			while(Defered.size() > 0){
+				R = Defered.poll();
+				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Release, getClock()));
+			}
+				
+		}
 	}
 	
 	static void updateReplied(int index, boolean value){

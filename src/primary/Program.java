@@ -2,6 +2,7 @@ package primary;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.util.*;
 
 public class Program {
@@ -13,7 +14,7 @@ public class Program {
 	static Map<Integer, String> addresses = new HashMap<>();
 	static Map<Integer, String> ports = new HashMap<>();
 	static Map<Integer, Socket> clients = new HashMap<>();
-	static Map<Integer, ObjectOutputStream> oos = new HashMap<>();
+	static Map<Integer, ObjectOutputStream> oos = new HashMap<>(); //Maybe remove the Synch on write function and make this a ConcurrentHashMap<K,V>???
 	static boolean Lamports = true;
 	static Server svr;
     private static Random rand;
@@ -33,12 +34,17 @@ public class Program {
 		svr.start();
 		
 		try{
+			if(myNode == 0)
+				Files.deleteIfExists(Paths.get("cs.txt"));
+			
 			Thread.sleep(5000);
 			
 			clientSetup(addresses, ports);
 						
 			System.out.println("Starting CS Requests");
-
+			
+			BufferedWriter writer;
+			
 			//Start of Application and run for numRequests times
 			for(int i = 0; i < numRequests; i++){
 				System.out.println("Starting Request: " + i);
@@ -46,9 +52,22 @@ public class Program {
 				Thread.sleep(generateInterRequestDelay());
 				//Attempt to enter CS
 				csEnter(Lamports);
+				
+				writer = new BufferedWriter(new FileWriter("cs.txt", true));
+				
+				writer.append("Node " + myNode + " enters.");
+				writer.append(System.lineSeparator());
+				
 				System.out.println("Node: " + myNode + " is in the CS with clock value: " + Server.Q.peek().getClock());
 				//Sleep while in the CS
 				Thread.sleep(generateExectutionTime());
+				
+				writer.append("Node " + myNode + " exits.");
+				writer.append(System.lineSeparator());
+				
+				writer.flush();
+				writer.close();
+				
 				//Attempt to exit CS
 				csExit(Lamports);
 				System.out.println("Finished Request: " + i);

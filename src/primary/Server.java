@@ -155,6 +155,7 @@ class Server extends Thread{
 			myClock = ++newClock;
 		else
 			myClock++;
+		System.out.println("Clock is now: " + myClock);
 		ClockLock.writeLock().unlock();
 	}
 	

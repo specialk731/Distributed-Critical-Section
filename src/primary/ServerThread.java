@@ -69,14 +69,6 @@ class ServerThread extends Thread{
 							}else{
                                 Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock()));
                             }
-
-							/*
-							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock())
-								//Send Reply
-								Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
-							else
-								//Otherwise Defer
-								Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));*/
 						}
 						break;
 					case Reply:
@@ -90,7 +82,6 @@ class ServerThread extends Thread{
 					case Termination:
 						System.out.println(Program.myNode + " received a termination from " + m.GetFrom());
 						Server.updateTerminate(index, true);
-						//terminate = true;
 						break;
 					case Exit:
 						System.out.println(Program.myNode + " received a exit from " + m.GetFrom());
@@ -123,12 +114,5 @@ class ServerThread extends Thread{
 			System.out.println("Error in ServerThread: ");
 			e.printStackTrace();
 		}
-	}	
-	
-	/*synchronized void write(Message m) throws Exception{
-		System.out.println("Thread " + index + " Writing message: " + m.GetClock());
-		oos.writeObject(m);
-		oos.flush();
-	}*/
-	
+	}
 }

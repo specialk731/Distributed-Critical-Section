@@ -164,7 +164,7 @@ class Server extends Thread{
 			Requests R;
 			while(Defered.size() > 0){
 				R = Defered.poll();
-				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Release, getClock()));
+				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Reply, getClock()));
 			}
 		}
 	}

@@ -53,6 +53,7 @@ public class Program {
 				Thread.sleep(generateInterRequestDelay());
 				//Attempt to enter CS
 				csEnter(Lamports);
+				inCS = true;
 				
 				writer = new BufferedWriter(new FileWriter("cs.txt", true));
 				
@@ -70,6 +71,7 @@ public class Program {
 				writer.close();
 				
 				//Attempt to exit CS
+                inCS = false;
 				csExit(Lamports);
 				System.out.println("Finished Request: " + i);
 			}

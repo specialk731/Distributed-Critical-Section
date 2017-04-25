@@ -58,17 +58,17 @@ class ServerThread extends Thread{
 						//System.out.println("Adding to Q: " + m.GetFrom() + ":" + m.GetClock());
 						if(Program.Lamports){
 							Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
-							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
+							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock()));
 						}
 						else{
 							//If we are in the CS then Deffer Reply
 							if(Program.inCS){
-
+                                Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
 
 							//If we are not in the CS then Reply immediately
 							}else{
-
-							}
+                                Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock()));
+                            }
 
 							/*
 							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock())
@@ -85,11 +85,7 @@ class ServerThread extends Thread{
 						break;
 					case Release:
 						System.out.println(Program.myNode + " received a release from " + m.GetFrom());
-						if(Program.Lamports)
-							Server.Q.take();
-						else{
-
-						}
+                        Server.Q.take();
 						break;
 					case Termination:
 						System.out.println(Program.myNode + " received a termination from " + m.GetFrom());

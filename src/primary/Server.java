@@ -94,10 +94,10 @@ class Server extends Thread{
 		System.out.println("End of Server");
 	}
 	
-	public void Lamports() throws Exception{
-		//On generating a critical section request:
-		// Insert the request into the priority queue
-		Q.put(new Requests(Program.myNode, getClock()));
+	public long Lamports() throws Exception{
+        //On generating a critical section request:
+        // Insert the request into the priority queue
+        Q.put(new Requests(Program.myNode, getClock()));
 
 		for(int i=0; i<Program.numNodes-1; i++) {
 			updateReplied(i,false);
@@ -121,10 +121,10 @@ class Server extends Thread{
 			}
 			//Thread.sleep(100);
 		}
-		return;
+		return myClock;
 	}
 	
-	public synchronized void RicartAndAgrawala() throws Exception{
+	public synchronized long RicartAndAgrawala() throws Exception{
 		//steps:
 		//  On generating a critical section request:
 		//	  broadcast the request to all processes
@@ -142,16 +142,16 @@ class Server extends Thread{
 				wait();
 			}
 		}
-		return;
+		return myClock;
 	}
 	
-	public void Release() throws Exception{
+	public long Release(boolean lamports) throws Exception{
 		//Lamports:
 		//  on leaving the critical section:
 		//	  remove the request from the queue
 		Q.take();
 		//	  Broadcast a release message to all processes
-		if(Program.Lamports){
+		if(lamports){
 			for(int i = 0; i < Program.numNodes-1; i++){
 				Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
 				//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
@@ -168,6 +168,8 @@ class Server extends Thread{
 				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Release, getClock()));
 			}
 		}
+        
+        return myClock;
 	}
 	
 	static void updateReplied(int index, boolean value){
@@ -226,6 +228,7 @@ class Server extends Thread{
 	public void TurnOffServer() throws Exception {
 		serversocket.close();
 	}
+
 }
 
 class Requests implements Comparable<Requests>{

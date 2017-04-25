@@ -56,7 +56,7 @@ public class Program {
 				
 				writer = new BufferedWriter(new FileWriter("output-" + myNode + ".txt", true));
 				
-				writer.append("Node " + myNode + " enters; Clock: " + enterTime);
+				writer.append("Enter," + enterTime);
 				writer.append(System.lineSeparator());
 				
 				System.out.println("Node: " + myNode + " is in the CS with clock value: " + Server.Q.peek().getClock());
@@ -66,7 +66,7 @@ public class Program {
 				//Attempt to exit CS
 				long exitTime = csExit(Lamports);
 				
-				writer.append("Node " + myNode + " exits; Clock: " + exitTime);
+				writer.append("Exit," + exitTime);
 				writer.append(System.lineSeparator());
 				
 				writer.flush();

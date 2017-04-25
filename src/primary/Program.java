@@ -60,7 +60,7 @@ public class Program {
 				writer.append("Node " + myNode + " enters.");
 				writer.append(System.lineSeparator());
 				
-				System.out.println("Node: " + myNode + " is in the CS with clock value: " + Server.Q.peek().getClock());
+				//System.out.println("Node: " + myNode + " is in the CS with clock value: " + Server.Q.peek().getClock());
 				//Sleep while in the CS
 				Thread.sleep(generateExectutionTime());
 				

@@ -61,8 +61,8 @@ class ServerThread extends Thread{
 							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock()));
 						}
 						else{
-							//If we are in the CS then Deffer Reply
-							if(Program.inCS){
+							//If we are in the CS then Defer Reply
+							if(Program.inCS || Server.csClock > m.GetClock() || (Server.csClock == m.GetClock() && Program.myNode > m.GetFrom())){
                                 Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
 
 							//If we are not in the CS then Reply immediately

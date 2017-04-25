@@ -10,6 +10,7 @@ class Server extends Thread{
 	String myAddress;
 	int myPort;
 	static private long myClock = 0;
+	static long csClock = -1;
 	static ReadWriteLock ClockLock = new ReentrantReadWriteLock(), RepliedLock = new ReentrantReadWriteLock(), terminateLock = new ReentrantReadWriteLock();
 	static boolean serverOn = true;
 	static boolean[] replied, terminate;
@@ -97,6 +98,7 @@ class Server extends Thread{
 	public void Lamports() throws Exception{
         //On generating a critical section request:
         // Insert the request into the priority queue
+        //long tmpClock = getClock();
         Q.put(new Requests(Program.myNode, getClock()));
 
         for(int i=0; i<Program.numNodes-1; i++) {
@@ -128,11 +130,12 @@ class Server extends Thread{
         //steps:
         //  On generating a critical section request:
         //      broadcast the request to all processes
+        csClock = getClock();
         for(int i = 0; i < Program.numNodes-1; i++){
             updateReplied(i, false);
         }
         for(int i = 0; i < Program.numNodes-1; i++){
-            Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
+            Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, csClock));
         }
 
         //  Enter critical section only once Pi has received a REPLY from all processes
@@ -141,6 +144,8 @@ class Server extends Thread{
                 wait();
             }
         }
+
+        csClock = -1;
         return;
 	}
 	

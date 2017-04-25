@@ -80,7 +80,7 @@ public class Program {
 		mainDone = true;
 		
 		for(int i=0; i<neighborsNode.length; i++) {
-			write(i, new Message(myNode, i, Message.type.Termination, Server.getClock()));
+			write(i, new Message(myNode, neighborsNode[i], Message.type.Termination, Server.getClock()));
 		}
 		
 		System.out.println("Node " + myNode + " has finished");

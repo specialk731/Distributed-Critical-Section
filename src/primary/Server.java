@@ -62,7 +62,7 @@ class Server extends Thread{
 				
 				for(int i=0; i<threads.size(); i++) {
 					try {
-						Program.write(i, new Message(Program.myNode, i, Message.type.Exit, myClock));
+						Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Exit, myClock));
 						
 						threads.get(i).join();
 					} catch (Exception e) {

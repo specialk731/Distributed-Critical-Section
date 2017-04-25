@@ -129,13 +129,17 @@ class Server extends Thread{
         //  On generating a critical section request:
         //      broadcast the request to all processes
         for(int i = 0; i < Program.numNodes-1; i++){
-            //threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
             updateReplied(i, false);
+        }
+        for(int i = 0; i < Program.numNodes-1; i++){
+            Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
         }
 
         //  Enter critical section only once Pi has received a REPLY from all processes
         while(!RepliedAllTrue()){
-            this.wait();
+            synchronized(this){
+                wait();
+            }
         }
         return;
 	}
@@ -146,22 +150,22 @@ class Server extends Thread{
         //      remove the request from the queue
         Q.take();
         //      Broadcast a release message to all processes
-        if(Program.Lamports)
-		for(int i = 0; i < Program.numNodes-1; i++)
-			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
-			//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
+        if(Program.Lamports){
+            for(int i = 0; i < Program.numNodes-1; i++){
+                Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
+                //threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
+            }
+        }
 
         //RicartAgrawalas:
         // send all deferred REPLY messages
         //TODO
-		
         else{
 			Requests R;
 			while(Defered.size() > 0){
 				R = Defered.poll();
 				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Release, getClock()));
 			}
-				
 		}
 	}
 	

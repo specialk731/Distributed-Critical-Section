@@ -99,11 +99,14 @@ class Server extends Thread{
         // Insert the request into the priority queue
         Q.put(new Requests(Program.myNode, getClock()));
 
+        for(int i=0; i<Program.numNodes-1; i++) {
+        	updateReplied(i,false);
+        }
+        
         // Broadcast the request to all processes
 		for(int i = 0; i < Program.numNodes-1; i++){
 			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
 			//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
-			updateReplied(i,false);
 		}
 		
         // Enter critical section only when:
@@ -163,10 +166,10 @@ class Server extends Thread{
 	}
 	
 	static void updateReplied(int index, boolean value){
-		//System.out.println("Changing: " + index + " to: " + value);
+		System.out.println("Changing: " + index + " to: " + value);
 		RepliedLock.writeLock().lock();
-		//System.out.println("Index: " + index);
 		replied[index]=value;
+		System.out.println("Index: " + index + "; Value: " + replied[index]);
 		RepliedLock.writeLock().unlock();
 	}
 	

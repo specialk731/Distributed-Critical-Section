@@ -218,9 +218,7 @@ public class Program {
 	}
 	
 	private static void csExit(boolean Lamp) throws Exception{
-		if(Lamp)
-			svr.Release();
-		else;
+		svr.Release();
 	}
 	
 	public static int Convert(int i){

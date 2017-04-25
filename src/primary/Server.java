@@ -169,7 +169,7 @@ class Server extends Thread{
         else{
             Q.take();
 			Requests R;
-			while(Defered.size() > 0){
+			while(Defered.size() > 0 && Defered.peek().getNode() != Program.myNode){
 				R = Defered.poll();
 				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Reply, getClock()));
 			}

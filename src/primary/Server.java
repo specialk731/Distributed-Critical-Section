@@ -131,6 +131,7 @@ class Server extends Thread{
         //  On generating a critical section request:
         //      broadcast the request to all processes
         csClock = getClock();
+        Q.put(new Requests(Program.myNode, getClock()));
         for(int i = 0; i < Program.numNodes-1; i++){
             updateReplied(i, false);
         }
@@ -166,6 +167,7 @@ class Server extends Thread{
         // send all deferred REPLY messages
         //TODO
         else{
+            Q.take();
 			Requests R;
 			while(Defered.size() > 0){
 				R = Defered.poll();

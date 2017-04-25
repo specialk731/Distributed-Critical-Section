@@ -20,7 +20,7 @@ public class Program {
     private static Random rand;
     static boolean mainDone = false;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
         rand = new Random();
         
@@ -78,6 +78,10 @@ public class Program {
 		}
 		
 		mainDone = true;
+		
+		for(int i=0; i<neighborsNode.length; i++) {
+			write(i, new Message(myNode, i, Message.type.Termination, Server.getClock()));
+		}
 		
 		System.out.println("Node " + myNode + " has finished");
 		

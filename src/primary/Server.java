@@ -57,7 +57,7 @@ class Server extends Thread{
 		
 		while(!terminating) {
 			
-			if(Program.mainDone && RepliedAllTrue()) {
+			if(Program.mainDone && TerminateAllTrue()) {
 				termThreads = true;
 				
 				for(int i=0; i<threads.size(); i++) {

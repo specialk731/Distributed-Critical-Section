@@ -56,14 +56,30 @@ class Server extends Thread{
 		boolean terminating = false;
 		
 		while(!terminating) {
-			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			//System.out.println("MainDone: " + Program.mainDone + "; TerminateAllTrue: " + TerminateAllTrue());
 			if(Program.mainDone && TerminateAllTrue()) {
 				termThreads = true;
 				
+				System.out.println("We made the terminate if statement");
+				
+				for(int i=0; i<Program.neighborsNode.length; i++) {
+					try {
+						Thread.sleep(100);
+						System.out.println("Sending Exit to " + Program.neighborsNode[i]);
+						Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Exit, myClock));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				
 				for(int i=0; i<threads.size(); i++) {
 					try {
-						Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Exit, myClock));
-						
 						threads.get(i).join();
 					} catch (Exception e) {
 						e.printStackTrace();

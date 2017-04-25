@@ -54,6 +54,7 @@ class ServerThread extends Thread{
 
 					switch(m.GetType()){
 					case Request:
+						System.out.println(Program.myNode + " received a request from " + m.GetFrom());
 						//System.out.println("Adding to Q: " + m.GetFrom() + ":" + m.GetClock());
 						Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
 						if(Program.Lamports)
@@ -69,16 +70,20 @@ class ServerThread extends Thread{
 						}
 						break;
 					case Reply:
+						System.out.println(Program.myNode + " received a reply from " + m.GetFrom());
 						Server.updateReplied(index, true);
 						break;
 					case Release:
+						System.out.println(Program.myNode + " received a release from " + m.GetFrom());
 						Server.Q.take();								
 						break;
 					case Termination:
+						System.out.println(Program.myNode + " received a termination from " + m.GetFrom());
 						Server.updateTerminate(index, true);
 						//terminate = true;
 						break;
 					case Exit:
+						System.out.println(Program.myNode + " received a exit from " + m.GetFrom());
 						break;
 					default:
 						System.out.println("Message Type ERROR...");

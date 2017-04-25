@@ -54,7 +54,7 @@ public class Program {
 				//Attempt to enter CS
 				long enterTime = csEnter(Lamports);
 				
-				writer = new BufferedWriter(new FileWriter("cs.txt", true));
+				writer = new BufferedWriter(new FileWriter("output-" + myNode + ".txt", true));
 				
 				writer.append("Node " + myNode + " enters; Clock: " + enterTime);
 				writer.append(System.lineSeparator());

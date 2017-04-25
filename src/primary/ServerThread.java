@@ -56,17 +56,27 @@ class ServerThread extends Thread{
 					case Request:
 						System.out.println(Program.myNode + " received a request from " + m.GetFrom());
 						//System.out.println("Adding to Q: " + m.GetFrom() + ":" + m.GetClock());
-						Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
-						if(Program.Lamports)
+						if(Program.Lamports){
+							Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
 							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
+						}
 						else{
-							//HERE IS WHERE I STOPPED
+							//If we are in the CS then Deffer Reply
+							if(Program.inCS){
+
+
+							//If we are not in the CS then Reply immediately
+							}else{
+
+							}
+
+							/*
 							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock())
 								//Send Reply
 								Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
 							else
 								//Otherwise Defer
-								Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
+								Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));*/
 						}
 						break;
 					case Reply:
@@ -75,7 +85,11 @@ class ServerThread extends Thread{
 						break;
 					case Release:
 						System.out.println(Program.myNode + " received a release from " + m.GetFrom());
-						Server.Q.take();								
+						if(Program.Lamports)
+							Server.Q.take();
+						else{
+
+						}
 						break;
 					case Termination:
 						System.out.println(Program.myNode + " received a termination from " + m.GetFrom());

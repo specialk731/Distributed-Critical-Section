@@ -18,7 +18,7 @@ public class Program {
 	static boolean Lamports = true;
 	static Server svr;
     private static Random rand;
-    static boolean mainDone = false;
+    static boolean mainDone = false, inCS = false;
 	
 	public static void main(String[] args) throws Exception {
 		

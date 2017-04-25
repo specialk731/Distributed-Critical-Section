@@ -124,7 +124,7 @@ class Server extends Thread{
 		return;
 	}
 	
-	public synchronized void RicartAndAgrawala() throws Exception{
+	public void RicartAndAgrawala() throws Exception{
         //steps:
         //  On generating a critical section request:
         //      broadcast the request to all processes

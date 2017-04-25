@@ -116,10 +116,10 @@ class Server extends Thread{
         //  (Pi's request has the smallest timestamp among all requests received by Pi so far.
 		while(!RepliedAllTrue() || Q.peek().getNode() != Program.myNode){
 			//System.out.println("Waiting for CS... Peeked a " + Q.peek().getNode());
-			//synchronized(this){
-			//	wait();
-			//}
-			Thread.sleep(100);
+			synchronized(this){
+				wait();
+			}
+			//Thread.sleep(100);
 		}
 		return;
 	}

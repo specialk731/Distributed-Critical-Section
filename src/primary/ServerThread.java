@@ -90,9 +90,9 @@ class ServerThread extends Thread{
 					}
 					
 					Server.updateClock(m.GetClock());
-					//synchronized(svr){
-					//svr.notify();
-					//}
+					synchronized(svr){
+					svr.notify();
+					}
 
 					
 				}

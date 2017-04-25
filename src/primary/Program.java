@@ -17,14 +17,14 @@ public class Program {
 	static Map<Integer, ObjectOutputStream> oos = new HashMap<>(); //Maybe remove the Synch on write function and make this a ConcurrentHashMap<K,V>???
 	static boolean Lamports = true;
 	static Server svr;
-    private static Random rand;
-    static boolean mainDone = false;
+	private static Random rand;
+	static boolean mainDone = false;
 	
 	public static void main(String[] args) throws Exception {
 		
-        rand = new Random();
-        
-        //Uses config.txt to set up variables
+		rand = new Random();
+		
+		//Uses config.txt to set up variables
 		setup(args);
 		
 		//Outputs to console variables from config.txt
@@ -185,22 +185,22 @@ public class Program {
 	
 	private static long generateInterRequestDelay(){
 		long tmp;
-        //mean value of an exponentially distributed random value is 1/lambda
-        // a random exponentially distributed value can be given by log(1-x)/lambda
-        // where 0<=x<=1. Thus "log(1-x)*mean" is a suitable function.
+		//mean value of an exponentially distributed random value is 1/lambda
+		// a random exponentially distributed value can be given by log(1-x)/lambda
+		// where 0<=x<=1. Thus "log(1-x)*mean" is a suitable function.
 		tmp = (long) Math.log(1-rand.nextLong())*interRequestDelay;
-        // (no Math.log function returns long type, so I'm casting it.)
+		// (no Math.log function returns long type, so I'm casting it.)
 		
 		return tmp;
 	}
 	
 	private static long generateExectutionTime(){
 		long tmp;
-        //mean value of an exponentially distributed random value is 1/lambda
-        // a random exponentially distributed value can be given by log(1-x)/lambda
-        // where 0<=x<=1. Thus "log(1-x)*mean" is a suitable function.
+		//mean value of an exponentially distributed random value is 1/lambda
+		// a random exponentially distributed value can be given by log(1-x)/lambda
+		// where 0<=x<=1. Thus "log(1-x)*mean" is a suitable function.
 		tmp = (long) Math.log(1-rand.nextLong())*executionTime;
-        // (no Math.log function returns long type, so I'm casting it.)
+		// (no Math.log function returns long type, so I'm casting it.)
 		
 		return tmp;
 		

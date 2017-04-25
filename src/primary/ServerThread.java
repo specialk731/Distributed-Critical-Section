@@ -33,22 +33,22 @@ class ServerThread extends Thread{
 					//System.out.println("Thread: " + index + " Waiting for Message...");
 					m = (Message)ois.readObject();
 					
-                    //Lamports:
-                    // on receiving a critical section request from another process:
-                    //  insert the request into the priority queue (done)
-                    //  send a REPLY message to the requesting process
-                    //
-                    // On receiving a release message from another process:
-                    //  remove the request of that process from the queue (done)
+					//Lamports:
+					// on receiving a critical section request from another process:
+					//  insert the request into the priority queue (done)
+					//  send a REPLY message to the requesting process
+					//
+					// On receiving a release message from another process:
+					//  remove the request of that process from the queue (done)
 
 
-                    //RicartAgrawalas:
-                    //TODO
-                    // On receiving a critical section request from another process:
-                    // if (Pi has no unfulfilled request of its own OR
-                    //     Pi's unfulfilled request has a larger timestamp than that of the received request):
-                    // then send a REPLY to requesting process
-                    // else: defer sending REPLY message
+					//RicartAgrawalas:
+					//TODO
+					// On receiving a critical section request from another process:
+					// if (Pi has no unfulfilled request of its own OR
+					//	 Pi's unfulfilled request has a larger timestamp than that of the received request):
+					// then send a REPLY to requesting process
+					// else: defer sending REPLY message
 					
 					//System.out.println("Thread " + index + " Got a message");
 
@@ -56,10 +56,11 @@ class ServerThread extends Thread{
 					case Request:
 						System.out.println(Program.myNode + " received a request from " + m.GetFrom());
 						//System.out.println("Adding to Q: " + m.GetFrom() + ":" + m.GetClock());
-						Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
-						if(Program.Lamports)
+						if(Program.Lamports){
+							Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
 							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
-						else{
+						}
+						else{ //R&A
 							//HERE IS WHERE I STOPPED
 							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock())
 								//Send Reply

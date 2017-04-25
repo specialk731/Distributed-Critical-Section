@@ -8,7 +8,7 @@ class Message implements Serializable{
 	private int from = -1, to = -1;
 	long clock = -1;
 	boolean isActive = false;
-	public enum type {Termination, Request, Reply, Release}; 
+	public enum type {Termination, Request, Reply, Release, Exit}; 
 	type Type;
 	
 	//Message

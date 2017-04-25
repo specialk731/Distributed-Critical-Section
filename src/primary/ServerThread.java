@@ -78,18 +78,20 @@ class ServerThread extends Thread{
 						Server.updateTerminate(index, true);
 						//terminate = true;
 						break;
+					case Exit:
+						break;
 					default:
 						System.out.println("Message Type ERROR...");
 					}
 					
 					Server.updateClock(m.GetClock());
-					synchronized(svr){
-					svr.notify();
-					}
+					//synchronized(svr){
+					//svr.notify();
+					//}
 
 					
 				}
-				while(!terminate);
+				while(!Server.termThreads);
 			} else {
 				System.out.println("Got a bad Node");
 			}

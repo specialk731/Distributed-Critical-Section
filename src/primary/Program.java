@@ -18,6 +18,7 @@ public class Program {
 	static boolean Lamports = true;
 	static Server svr;
     private static Random rand;
+    static boolean mainDone = false;
 	
 	public static void main(String[] args) {
 		
@@ -75,7 +76,9 @@ public class Program {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-						
+		
+		mainDone = true;
+		
 		System.out.println("Node " + myNode + " has finished");
 		
 		//svr.done();

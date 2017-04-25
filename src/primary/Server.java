@@ -16,6 +16,7 @@ class Server extends Thread{
 	static int numNodes;
 	static ServerSocket serversocket;
 	List<ServerThread> threads = new ArrayList<>();
+	static boolean termThreads = false;
 	
 	static Queue<Requests> Defered = new ConcurrentLinkedQueue<>();
 	static BlockingQueue<Requests> Q = new PriorityBlockingQueue<>();
@@ -52,11 +53,24 @@ class Server extends Thread{
 			e.printStackTrace();
 		}
 		
-		for(int i=0; i<threads.size(); i++) {
-			try {
-				threads.get(i).join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		boolean terminating = false;
+		
+		while(!terminating) {
+			
+			if(Program.mainDone && RepliedAllTrue()) {
+				termThreads = true;
+				
+				for(int i=0; i<threads.size(); i++) {
+					try {
+						Program.write(i, new Message(Program.myNode, i, Message.type.Exit, myClock));
+						
+						threads.get(i).join();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				
+				terminating = true;
 			}
 		}
 		
@@ -83,9 +97,10 @@ class Server extends Thread{
         //  (Pi's request has the smallest timestamp among all requests received by Pi so far.
 		while(!RepliedAllTrue() || Q.peek().getNode() != Program.myNode){
 			//System.out.println("Waiting for CS... Peeked a " + Q.peek().getNode());
-			synchronized(this){
-				wait();
-			}
+			//synchronized(this){
+			//	wait();
+			//}
+			Thread.sleep(100);
 		}
 		return;
 	}

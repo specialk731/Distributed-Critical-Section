@@ -35,8 +35,7 @@ public class Program {
 		svr.start();
 		
 		try{
-			if(myNode == 0)
-				Files.deleteIfExists(Paths.get("cs.txt"));
+			Files.deleteIfExists(Paths.get("output-" + myNode + ".txt"));
 			
 			Thread.sleep(5000);
 			

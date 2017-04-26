@@ -52,11 +52,11 @@ public class Program {
 				//Sleep before entering CS
 				Thread.sleep(generateInterRequestDelay());
 				//Attempt to enter CS
-				long enterTime = csEnter(Lamports);
+				csEnter(Lamports);
 				
 				writer = new BufferedWriter(new FileWriter("cs.txt", true));
 				
-				writer.append("Node " + myNode + " enters; Clock: " + enterTime);
+				writer.append(myNode + " enter");
 				writer.append(System.lineSeparator());
 				
 				System.out.println("Node: " + myNode + " is in the CS with clock value: " + Server.Q.peek().getClock());
@@ -64,9 +64,9 @@ public class Program {
 				Thread.sleep(generateExectutionTime());
 				
 				//Attempt to exit CS
-				long exitTime = csExit(Lamports);
+				csExit(Lamports);
 				
-				writer.append("Node " + myNode + " exits; Clock: " + exitTime);
+				writer.append(myNode + " exit");
 				writer.append(System.lineSeparator());
 				
 				writer.flush();
@@ -207,26 +207,24 @@ public class Program {
 		
 	}
 	
-	private static long csEnter(boolean Lamp) throws Exception{
-		long enterTime;
+	private static void csEnter(boolean Lamp) throws Exception{
 		
 		if(Lamp)
-			enterTime = svr.Lamports();
+			svr.Lamports();
 		else
-			enterTime = svr.RicartAndAgrawala();
+			svr.RicartAndAgrawala();
 		
-		return enterTime; //Don't return until you are allowed in the CS
+		return; //Don't return until you are allowed in the CS
 	}
 	
-	private static long csExit(boolean Lamp) throws Exception{
-		long exitTime = -1;
+	private static void csExit(boolean Lamp) throws Exception{
 		
 		if(Lamp)
-			exitTime = svr.Release(Lamp);
+			svr.Release(Lamp);
 		else
-			exitTime = svr.Release(Lamp);
+			svr.Release(Lamp);
 		
-		return exitTime;
+		return;
 	}
 	
 	public static int Convert(int i){

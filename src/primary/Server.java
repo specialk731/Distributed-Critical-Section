@@ -94,7 +94,7 @@ class Server extends Thread{
 		System.out.println("End of Server");
 	}
 	
-	public long Lamports() throws Exception{
+	public void Lamports() throws Exception{
         //On generating a critical section request:
         // Insert the request into the priority queue
         Q.put(new Requests(Program.myNode, getClock()));
@@ -121,10 +121,10 @@ class Server extends Thread{
 			}
 			//Thread.sleep(100);
 		}
-		return myClock;
+		return;
 	}
 	
-	public synchronized long RicartAndAgrawala() throws Exception{
+	public synchronized void RicartAndAgrawala() throws Exception{
 		//steps:
 		//  On generating a critical section request:
 		//	  broadcast the request to all processes
@@ -142,7 +142,7 @@ class Server extends Thread{
 				wait();
 			}
 		}
-		return myClock;
+		return;
 	}
 	
 	public long Release(boolean lamports) throws Exception{

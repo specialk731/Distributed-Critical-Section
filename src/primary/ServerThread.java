@@ -49,42 +49,36 @@ class ServerThread extends Thread{
 					//	 Pi's unfulfilled request has a larger timestamp than that of the received request):
 					// then send a REPLY to requesting process
 					// else: defer sending REPLY message
-					
-					//System.out.println("Thread " + index + " Got a message");
 
 					switch(m.GetType()){
 					case Request:
-						System.out.println(Program.myNode + " received a request from " + m.GetFrom());
-						//System.out.println("Adding to Q: " + m.GetFrom() + ":" + m.GetClock());
 						if(Program.Lamports){
 							Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
 							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
 						}
-						else{ //R&A
+						else { //R&A
 
-							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock() || (Server.Q.peek().getClock() == m.GetClock() && Server.Q.peek().getNode() > m.GetFrom()))
-								//Send Reply
-								Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
-							else
-								//Otherwise Defer
-								Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
+							synchronized (Server.Q) {
+								if (Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock() || (Server.Q.peek().getClock() == m.GetClock() && Server.Q.peek().getNode() > m.GetFrom()))
+									//Send Reply
+									Program.write(Program.Convert(m.GetFrom()), new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
+								else
+									//Otherwise Defer
+									Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
+							}
 						}
 						break;
 					case Reply:
-						System.out.println(Program.myNode + " received a reply from " + m.GetFrom());
 						Server.updateReplied(index, true);
 						break;
 					case Release:
-						System.out.println(Program.myNode + " received a release from " + m.GetFrom());
-						Server.Q.take();								
+						Server.Q.take();
 						break;
 					case Termination:
-						System.out.println(Program.myNode + " received a termination from " + m.GetFrom());
 						Server.updateTerminate(index, true);
 						//terminate = true;
 						break;
 					case Exit:
-						System.out.println(Program.myNode + " received a exit from " + m.GetFrom());
 						break;
 					default:
 						System.out.println("Message Type ERROR...");
@@ -114,12 +108,5 @@ class ServerThread extends Thread{
 			System.out.println("Error in ServerThread: ");
 			e.printStackTrace();
 		}
-	}	
-	
-	/*synchronized void write(Message m) throws Exception{
-		System.out.println("Thread " + index + " Writing message: " + m.GetClock());
-		oos.writeObject(m);
-		oos.flush();
-	}*/
-	
+	}
 }

@@ -41,9 +41,7 @@ public class Program {
 			Thread.sleep(5000);
 			
 			clientSetup(addresses, ports);
-						
-			System.out.println("Starting CS Requests");
-			
+
 			BufferedWriter writer;
 			
 			//Start of Application and run for numRequests times
@@ -59,7 +57,6 @@ public class Program {
 				writer.append(myNode + " enter");
 				writer.append(System.lineSeparator());
 				
-				System.out.println("Node: " + myNode + " is in the CS with clock value: " + Server.Q.peek().getClock());
 				//Sleep while in the CS
 				Thread.sleep(generateExectutionTime());
 				
@@ -230,8 +227,6 @@ public class Program {
 	}
 	
 	synchronized static void write(int node,Message m) throws Exception{
-		//System.out.println("Writing to node " + node/* + " at index " + Convert(node)*/);
-		Server.updateClock(Server.getClock()+1);
 		oos.get(node).writeObject(m);
 		oos.get(node).flush();
 	}

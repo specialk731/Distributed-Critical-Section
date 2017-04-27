@@ -151,9 +151,9 @@ class Server extends Thread{
 		//Lamports:
 		//  on leaving the critical section:
 		//	  remove the request from the queue
-		Q.take();
 		//	  Broadcast a release message to all processes
 		if(lamports){
+			Q.take();
 			for(int i = 0; i < Program.numNodes-1; i++){
 				Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
 				//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Release, getClock()));
@@ -169,6 +169,8 @@ class Server extends Thread{
 				R = Defered.poll();
 				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Reply, getClock()));
 			}
+			Q.take();
+
 		}
         
         return myClock;

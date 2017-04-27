@@ -3,13 +3,6 @@ COMPILE
 ====================
 To compile, run "make" in this directory.
 
-====================
-RUN
-====================
-To run the program use "java Program <nodeID> <Optional R&A argument>
-<nodeID> should be the ID of the node for the specific instance of Program
-The optional argument will be "RandA" and is included to run Ricard and Agrawala's.
-If the optional argument is omited, the program will use Lamports.
 
 ====================
 RUN

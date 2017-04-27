@@ -231,7 +231,7 @@ public class Program {
 	
 	synchronized static void write(int node,Message m) throws Exception{
 		//System.out.println("Writing to node " + node/* + " at index " + Convert(node)*/);
-		//Server.updateClock(Server.getClock()+1);
+		Server.updateClock(Server.getClock()+1);
 		oos.get(node).writeObject(m);
 		oos.get(node).flush();
 	}

@@ -128,12 +128,13 @@ class Server extends Thread{
 		//steps:
 		//  On generating a critical section request:
 		//	  broadcast the request to all processes
-		Q.put(new Requests(Program.myNode, getClock()));
+		long tmpClock = getClock();
+		Q.put(new Requests(Program.myNode, tmpClock));
 		for(int i = 0; i < Program.numNodes-1; i++){
 			updateReplied(i, false);
 		}
 		for(int i = 0; i < Program.numNodes-1; i++){
-			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
+			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, tmpClock));
 		}
 
 		//  Enter critical section only once Pi has received a REPLY from all processes

@@ -62,7 +62,7 @@ class ServerThread extends Thread{
 						}
 						else{ //R&A
 
-							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock())
+							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock() || (Server.Q.peek().getClock() == m.GetClock() && Server.Q.peek().getNode() > m.GetFrom()))
 								//Send Reply
 								Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
 							else

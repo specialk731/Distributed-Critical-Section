@@ -97,7 +97,8 @@ class Server extends Thread{
 	public void Lamports() throws Exception{
         //On generating a critical section request:
         // Insert the request into the priority queue
-        Q.put(new Requests(Program.myNode, getClock()));
+		long tmpClock = getClock();
+        Q.put(new Requests(Program.myNode, tmpClock));
 
 		for(int i=0; i<Program.numNodes-1; i++) {
 			updateReplied(i,false);
@@ -105,7 +106,7 @@ class Server extends Thread{
 		
 		// Broadcast the request to all processes
 		for(int i = 0; i < Program.numNodes-1; i++){
-			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
+			Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, tmpClock));
 			//threads.get(i).write(new Message(Program.myNode, Program.neighborsNode[i], Message.type.Request, getClock()));
 		}
 		

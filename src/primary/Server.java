@@ -164,12 +164,12 @@ class Server extends Thread{
 		// send all deferred REPLY messages
 		//TODO
 		else{
-			Requests R;
+            synchronized (Q) {
+                Requests R;
 			while(Defered.size() > 0){
 				R = Defered.poll();
 				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Reply, getClock()));
 			}
-			synchronized (Q) {
 				Q.take();
 			}
 

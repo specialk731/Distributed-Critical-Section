@@ -1,13 +1,14 @@
 ====================
 COMPILE
 ====================
-To compile the program, first ensure that all included files are in a single directory
-Use "javac *.java" to build the class files needed to run the program
+To compile the program, first ensure that all included files are placed according to the included
+make file.
+Then, use the make file to compile all of the java into class files.
 
 ====================
 RUN
 ====================
-To run the program use "java Program <nodeID> <Optional R&A argument>
+To run the program use "java Program <nodeID> <Optional R&A argument>"
 <nodeID> should be the ID of the node for the specific instance of Program
 The optional argument will be "RandA" and is included to run Ricard and Agrawala's.
 If the optional argument is omited, the program will use Lamports.

@@ -61,7 +61,7 @@ class ServerThread extends Thread{
 							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
 						}
 						else{ //R&A
-							//HERE IS WHERE I STOPPED
+
 							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock())
 								//Send Reply
 								Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???

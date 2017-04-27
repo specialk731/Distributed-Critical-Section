@@ -169,7 +169,9 @@ class Server extends Thread{
 				R = Defered.poll();
 				Program.write(Program.Convert(R.getNode()), new Message(Program.myNode, R.getNode(), Message.type.Reply, getClock()));
 			}
-			Q.take();
+			synchronized (Q) {
+				Q.take();
+			}
 
 		}
         

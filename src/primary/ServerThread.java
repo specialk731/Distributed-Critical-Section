@@ -60,14 +60,16 @@ class ServerThread extends Thread{
 							Server.Q.put(new Requests(m.GetFrom(), m.GetClock()));
 							Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
 						}
-						else{ //R&A
+						else { //R&A
 
-							if(Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock() || (Server.Q.peek().getClock() == m.GetClock() && Server.Q.peek().getNode() > m.GetFrom()))
-								//Send Reply
-								Program.write(Program.Convert(m.GetFrom()),new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
-							else
-								//Otherwise Defer
-								Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
+							synchronized (Server.Q) {
+								if (Server.Q.size() == 0 || Server.Q.peek().getClock() > m.GetClock() || (Server.Q.peek().getClock() == m.GetClock() && Server.Q.peek().getNode() > m.GetFrom()))
+									//Send Reply
+									Program.write(Program.Convert(m.GetFrom()), new Message(Program.myNode, m.GetFrom(), Message.type.Reply, Server.getClock())); //Plus 1???
+								else
+									//Otherwise Defer
+									Server.Defered.add(new Requests(m.GetFrom(), m.GetClock()));
+							}
 						}
 						break;
 					case Reply:

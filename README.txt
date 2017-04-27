@@ -1,8 +1,7 @@
 ====================
 COMPILE
 ====================
-To compile the program, first ensure that all included files are in a single directory
-Use "javac *.java" to build the class files needed to run the program
+To compile, run "make" in this directory.
 
 ====================
 RUN
@@ -17,5 +16,5 @@ Without the scripts, each node must be started manually on the correct system as
 stated in config.txt
 Change the variables at the top of the script to match your current system configuration. 
 
-After all nodes have output that they are finished, use "java Verifier" to verify the output.
+After all nodes have output that they are finished, use "java -cp src Verifier" to verify the output.
 This program will inform the user of any errors by analyzing log files.

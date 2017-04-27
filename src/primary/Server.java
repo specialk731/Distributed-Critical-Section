@@ -248,6 +248,8 @@ class Requests implements Comparable<Requests>{
 			return 1;
 		else if(this.node < arg0.node)
 			return -1;
+		else if(this.node > arg0.node)
+			return 1;
 		else
 			return 0;
 	}

@@ -40,14 +40,7 @@ class Server extends Thread{
 				threads.get(i).start();
 				updateTerminate(i,false);
 			}
-			/*
-			while(!TerminateAllTrue()){
-				this.wait();
-			}
-			
-			for(int i = 0; i < Program.addresses.size(); i++)
-				threads.get(i).terminate = true;
-			*/
+
 		} catch(Exception e){
 			System.out.println("Error in Server: ");
 			e.printStackTrace();
@@ -59,19 +52,14 @@ class Server extends Thread{
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			//System.out.println("MainDone: " + Program.mainDone + "; TerminateAllTrue: " + TerminateAllTrue());
 			if(Program.mainDone && TerminateAllTrue()) {
 				termThreads = true;
-				
-				System.out.println("We made the terminate if statement");
-				
+
 				for(int i=0; i<Program.neighborsNode.length; i++) {
 					try {
 						Thread.sleep(100);
-						System.out.println("Sending Exit to " + Program.neighborsNode[i]);
 						Program.write(i, new Message(Program.myNode, Program.neighborsNode[i], Message.type.Exit, myClock));
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -179,10 +167,8 @@ class Server extends Thread{
 	}
 	
 	static void updateReplied(int index, boolean value){
-		System.out.println("Changing: " + index + " to: " + value);
 		RepliedLock.writeLock().lock();
 		replied[index]=value;
-		System.out.println("Index: " + index + "; Value: " + replied[index]);
 		RepliedLock.writeLock().unlock();
 	}
 	
@@ -202,7 +188,6 @@ class Server extends Thread{
 			myClock = ++newClock;
 		else
 			myClock++;
-		System.out.println("Clock is now: " + myClock);
 		ClockLock.writeLock().unlock();
 	}
 	
